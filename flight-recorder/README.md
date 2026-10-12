@@ -1,16 +1,19 @@
 # Flight Recorder
 
+> **New here? Read the [full user guide (PDF)](../docs/Flight-Recorder-User-Guide.pdf)** or the [Word version](../docs/Flight-Recorder-User-Guide.docx). It covers download, running on Mac and Windows, every step with screenshots, customizing, and troubleshooting.
+
 A free, offline walkthrough of a governed AI workflow for insurance. It shows five guardrails on one underwriting-summary agent, then turns the action log into a regulator-ready evidence pack.
 
-**Everything here is fictional sample data.** The "agent" is scripted, so the demo runs the same way every time with no internet, no account, and no model. Swap in any model your company approves. The guardrails are the point, not the model.
+**Everything in the policy files is SYNTHETIC SAMPLE DATA.** See [DATA-SOURCES.md](DATA-SOURCES.md) for exactly what's invented and what's public. The "agent" is scripted, so the demo runs the same way every time with no internet, no account, and no model. Swap in any model your company approves. The guardrails are the point, not the model.
 
-## What you'll see (about 12 minutes)
+## What you'll see (about 15 minutes)
 1. **Permission card.** What the agent may do, what it may never do, and who answers for it.
 2. **Summaries with sources.** Three files (P&C commercial property, individual life, property cat reinsurance). Every sentence carries a source tag you can click.
-3. **Second-pass verifier.** A separate check removes sentences that aren't in the file.
-4. **Last year's form.** A retired endorsement edition is caught and held until an underwriter confirms the current one.
+3. **Second-pass verifier.** A separate check opens each cited line and confirms every number and term is there. Unsupported sentences come out. Sentences that rest on a replaced form are marked "supported by a superseded source."
+4. **Last year's form.** Every form, rider, and clause reference is checked against a forms library, with or without an edition date. A retired edition (EB-204) and an undated clause (HC-3) are held until an underwriter confirms the current version.
 5. **Out-of-scope action.** An instruction hidden in a broker note asks the agent to issue a $4,800 return premium. The gate blocks it, logs it, and escalates to named roles.
-6. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
+6. **Watchlist: sneaky cases.** Three scenario cards where the system suspects something and pulls in a named person: (a) a state market exit, so the file conflicts with current appetite and filings (to the regional Underwriting Manager); (b) a reinsurer that excluded a state the primary still writes, so the ceded share may be uncovered (to the Ceded Reinsurance Manager); (c) impersonation signals such as a callback mismatch, video metadata dated before the loss, a look-alike approval email, and the same device and bank account across three claims (to an SIU Analyst). Reason codes on every card. The system never decides and never declares fraud.
+7. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
 
 ## Run it
 No install needed.
@@ -25,7 +28,7 @@ py -m http.server 8000           # Windows
 ```
 Then open http://localhost:8000.
 
-Jump straight to a step by adding `#step1` through `#step6` to the address. "Reset demo" starts over.
+Jump straight to a step by adding `#step1` through `#step7` to the address. "Reset demo" starts over.
 
 ## Files
 - `index.html` the whole demo, one file
@@ -33,12 +36,16 @@ Jump straight to a step by adding `#step1` through `#step6` to the address. "Res
 - `docs/run-of-show.md` presenter timing, `docs/video-script.md` short walkthrough script
 - `screenshots/` one image per step
 
-## Sources for the regulatory mapping
-- NAIC Model Bulletin: Use of Artificial Intelligence Systems by Insurers, adopted Dec 4, 2023. https://content.naic.org/sites/default/files/cmte-h-big-data-artificial-intelligence-wg-ai-model-bulletin.pdf.pdf
-- NAIC adoption map. https://content.naic.org/sites/default/files/legal-adoption-map-ai-model-bulletin.pdf
-- Colorado 3 CCR 702-10, Regulation 10-1-1, amended effective Oct 15, 2025. https://sos.state.co.us/CCR/GenerateRulePdf.do?fileName=3+CCR+702-10&ruleVersionId=12182
+## Sources for the regulatory mapping (accessed 2026-10-12)
+| Source | Exact sections used | URL |
+|---|---|---|
+| NAIC Model Bulletin: Use of Artificial Intelligence Systems by Insurers, adopted Dec 4, 2023 | Sec. 3: AIS Program Guidelines 1.3, 2.3(b), 2.3(d), 3.1, 3.2, 3.4, 3.6, and risk consideration (iii). Sec. 4: items 1.1(e)(i)(1), 1.3, 1.3(b) | https://content.naic.org/sites/default/files/cmte-h-big-data-artificial-intelligence-wg-ai-model-bulletin.pdf.pdf |
+| Colorado 3 CCR 702-10, Regulation 10-1-1, amended effective Oct 15, 2025 | Sec. 3 (applicability: individual life, private passenger auto, health benefit plans), Sec. 4.D (ECDIS), Sec. 5.A.6, 5.A.9, 5.C | https://sos.state.co.us/CCR/GenerateRulePdf.do?fileName=3+CCR+702-10&ruleVersionId=12182 |
 
 Check each reference against your own state's adopted version. This is a teaching example, not legal advice.
+
+## Testing
+See [TEST-REPORT.md](TEST-REPORT.md). Browser emulation only, not real Mac or Windows hardware.
 
 ## License
 MIT. Copy it, change it, use it at work.

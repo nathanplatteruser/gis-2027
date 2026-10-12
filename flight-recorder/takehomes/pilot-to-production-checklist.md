@@ -13,4 +13,6 @@ Answer yes to all ten, or write down who accepted the risk and why.
 9. **Ledger.** Is every read, draft, check, block, and human decision logged with time and actor?
 10. **Evidence on request.** Could you hand a regulator the evidence pack for any file within a day?
 
-Mapped to: NAIC AI Model Bulletin (Dec 4, 2023), Section 3 AIS Program Guidelines 1.0 to 4.0 and Section 4 Regulatory Oversight and Examination Considerations. Colorado 3 CCR 702-10, Section 5, for life, private passenger auto, and health insurers using external consumer data. Check your state's adopted version.
+Mapped to (accessed 2026-10-12): NAIC AI Model Bulletin (Dec 4, 2023), Sec. 3 AIS Program Guidelines 2.3(b) (Q1), 3.1 (Q2, Q7), 3.2 (Q3, Q5), 3.4 (Q4, Q6), 2.3(d) (Q8), 3.6 (Q9), and Sec. 4 item 1.3 (Q10). https://content.naic.org/sites/default/files/cmte-h-big-data-artificial-intelligence-wg-ai-model-bulletin.pdf.pdf
+Colorado 3 CCR 702-10 Sec. 5.A.6 and 5.A.9, for individual life, private passenger auto, and health benefit plan insurers using ECDIS. https://sos.state.co.us/CCR/GenerateRulePdf.do?fileName=3+CCR+702-10&ruleVersionId=12182
+Check your state's adopted version.

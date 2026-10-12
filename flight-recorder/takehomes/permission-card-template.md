@@ -22,4 +22,4 @@ Fill this out before any AI system touches a production file. The business owner
 
 Signed (business owner): ______________ Date: ________
 
-Reference: NAIC AI Model Bulletin, Section 3, AIS Program Guidelines 2.0 Governance and 3.1 constraints and controls on automation.
+Reference (accessed 2026-10-12): NAIC AI Model Bulletin, Sec. 3, AIS Program Guidelines 2.3(b) scope of responsibility and authority, 2.3(d) escalation, and 3.1 constraints and controls on automation. https://content.naic.org/sites/default/files/cmte-h-big-data-artificial-intelligence-wg-ai-model-bulletin.pdf.pdf
