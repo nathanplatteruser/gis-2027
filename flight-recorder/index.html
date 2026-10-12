@@ -22,7 +22,7 @@ table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-bottom:1px
 .src{font-size:12px;color:var(--acc);cursor:pointer;text-decoration:underline;margin-left:6px}
 .doc{font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;background:#f3f5f7;border:1px solid var(--line);border-radius:6px;padding:10px;max-height:260px;overflow:auto}
 .hl{background:#ffe58f}.inj{background:#ffd6d6;outline:1px dashed var(--bad)}
-.ledger{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace}.ledger div{border-bottom:1px solid var(--line);padding:5px 0}
+.ledger{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;max-height:75vh;overflow:auto}aside .card{position:sticky;top:8px}@media print{.ledger{max-height:none}}.ledger div{border-bottom:1px solid var(--line);padding:5px 0}
 .l-block{color:var(--bad);font-weight:700}.l-hold{color:var(--warn);font-weight:700}.l-ok{color:var(--ok)}
 .synth{display:inline-block;background:#6e40c9;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;border-radius:4px;padding:1px 6px;margin-left:6px}
 .files label{display:block;margin:4px 0}.k{font-weight:600}
@@ -94,6 +94,56 @@ const SCEN=[
   signals:["Callback to the phone number on file reached a different person than the one who called in (out-of-band mismatch)","Video statement metadata says recorded 2 days before the date of loss","Broker approval email came from a look-alike domain (channel mismatch)","Across three claims: same device ID, same bank account ending 4471, near-identical phrasing in the loss description"],
   route:"SIU Analyst (human spot-check)",code:"IMPERSONATION_SIGNALS",ref:"NAIC Sec. 3 risk consideration (iii); AIS Program Guidelines 2.3(d)",
   ctx:`Public context: 99% of insurers surveyed said they had encountered manipulated or AI-altered documentation (Verisk, State of Insurance Fraud study, <a href="${VERISK}">source</a>). In a Milliman quiz, people spotted AI-generated car damage images at roughly chance, about 50% (Milliman, Dec 2025, <a href="${MILLIMAN}">source</a>).`}];
+/* ---------- CURVEBALLS (all SYNTHETIC). Each check is live code below. ---------- */
+const TR39="https://www.unicode.org/reports/tr39/";
+function naiveNum(x){return parseFloat(x)}
+function strictAmount(x){const r=String(x);const t=r.trim();const notes=[];if(t!==r)notes.push("leading or trailing space");
+ if(/^\d{1,3}(\.\d{3})+,\d{2}$/.test(t)){notes.push("European format (dot thousands, comma decimal)");return{v:+t.replace(/\./g,"").replace(",","."),notes}}
+ if(/e/i.test(t)){notes.push("scientific notation");return{v:Number(t),notes}}
+ if(/^(\d+|\d{1,3}(,\d{3})+)(\.\d+)?$/.test(t))return{v:+t.replace(/,/g,""),notes};return{v:NaN,notes:["unrecognized format"]}}
+function skeleton(s){const map={"\u0456":"i","\u0430":"a","\u0435":"e","\u043e":"o","\u0440":"p","\u0441":"c","\u0445":"x"};return s.normalize("NFKC").toLowerCase().split("").map(c=>map[c]||c).join("").replace(/\bjon\b/,"john")}
+const CB=[
+ {id:"HW",title:"Handwritten margin edit vs typed field",code:"OCR_LOW_CONFIDENCE",route:"Claims Adjuster (read the original scan)",
+  run(){const typed=7500,ocr={text:"$1,500",conf:0.58};const naive=ocr.text;const hold=ocr.conf<0.85||strictAmount(ocr.text.replace("$","")).v!==typed;
+   return{naive:`OCR text "${naive}" accepted, payment set to $1,500`,guard:`OCR confidence ${ocr.conf} (threshold 0.85) and it disagrees with typed reserve $7,500. Held.`,hold}},
+  img:true,wrong:"Underpay a claim by $6,000, or overpay if the typed field was the wrong one.",impact:"Estimate: $6,000 on this one claim; repeated across a book of scanned notes, it adds up quietly."},
+ {id:"DT",title:"Amounts stored as text",code:"TYPE_COERCION",route:"Claims Data Steward",
+  run(){const rows=[["12,500.00","12.500,00"],["12500","1.25E4 (stored as text)"],["12500.00","12500.00 "]];
+   const r=rows.map(([a,b])=>{const bb=b.replace(" (stored as text)","");return{a,b,naiveEq:a===bb,naiveParse:naiveNum(bb),strict:strictAmount(bb),strictA:strictAmount(a)}});
+   const pol="00047213",cast=String(Number(pol));
+   return{rows:r,pol,cast,naive:`String compare says all 3 pairs differ; parseFloat("12.500,00") = ${naiveNum("12.500,00")} (silently $12.50). Policy ${pol} cast to number becomes ${cast}.`,
+    guard:`Format-aware parse: all 3 pairs equal $12,500.00, with notes (${r.map(x=>x.strict.notes.join("+")||"none").join("; ")}). Policy numbers kept as text; ${pol} vs ${cast} flagged as a dropped leading zero.`,hold:true}},
+  wrong:"A $12,500 payment recorded as $12.50, or a claim matched to the wrong policy because 00047213 became 47213.",impact:"Estimate: $12,487.50 misstatement on one line; wrong-policy matches are a coverage and privacy problem."},
+ {id:"RD",title:"Rounding drift between two systems",code:"PRECISION_DRIFT",route:"Premium Accounting Supervisor",
+  run(){const n=2000,unit=0.125;let perLine=0;for(let i=0;i<n;i++)perLine+=Math.round(unit*100+1e-9)/100; /* $0.125 rounds half-up to $0.13 on every line */
+   const exact=n*unit,diff=Math.round((perLine-exact)*100)/100;
+   return{naive:`Each line shows $0.13 in system A and $0.125 in system B, which displays as $0.13 too. Totals: system A $${perLine.toFixed(2)}, system B $${exact.toFixed(2)}. Reviewer sees two "right" numbers.`,guard:`Recomputed with exact cents: rounding each of ${n} lines (0.005 per line) drifts $${diff.toFixed(2)}. Held for reconciliation.`,hold:Math.abs(diff)>=0.01}},
+  wrong:"Two ledgers that never tie out, and nobody can say which one is right.",impact:"Estimate: $10 per 2,000 lines here; on millions of premium lines it's a recurring reconciliation break."},
+ {id:"SC",title:"Retrieval pulled last year's privacy notice",code:"STALE_COMPLIANCE_DOC",route:"Compliance Officer",
+  run(){const hits=[{doc:"Privacy Notice PN-7",ver:"2023",eff:"2023-01-01",superseded:"2025-07-01",score:0.91},{doc:"Privacy Notice PN-7",ver:"2025",eff:"2025-07-01",superseded:null,score:0.84}];
+   const top=hits[0],cur=hits.find(h=>!h.superseded);
+   return{hits,naive:`Search ranks ${top.doc} (${top.ver}) first (score ${top.score}); it's attached to the renewal packet.`,guard:`Effective-date and lineage check: ${top.ver} edition superseded ${top.superseded}. Current is ${cur.ver} (effective ${cur.eff}). Held; current version shown.`,hold:!!top.superseded}},
+  wrong:"Customers get a privacy notice that no longer matches how data is handled.",impact:"Risk estimate: a market-conduct finding and a re-mailing to every affected policyholder."},
+ {id:"TZ",title:"Loss 3 minutes before coverage, logged in UTC",code:"TIMEZONE_BIND",route:"Coverage Counsel / Claims Manager",
+  run(){const eff="2026-07-01 12:01 AM standard time at the insured's address (Central)",lossUTC="2026-07-01T04:58:00Z";
+   const local=new Date(Date.parse(lossUTC)-5*3600e3).toISOString().slice(0,16).replace("T"," ");
+   return{naive:`System date ${lossUTC.slice(0,10)} is on or after 07/01, so it reads "covered."`,guard:`Converted to Central (UTC-5, daylight time in July): ${local}, which is 11:58 PM on 06/30, before the 12:01 AM inception. Held for a coverage decision. Note: the policy says standard time, which is its own question for counsel.`,hold:true}},
+  wrong:"Paying a loss that happened before the policy started, or denying one that didn't. Both end up disputed.",impact:"Estimate: full loss amount, $38,000 in this synthetic file, plus dispute cost."},
+ {id:"UN",title:"Treaty schedule in thousands",code:"UNIT_MISMATCH",route:"Ceded Reinsurance Manager",
+  run(){const header="All figures in USD thousands",cell=8900,read=cell,actual=cell*1000;
+   return{naive:`Bordereau value read as $${read.toLocaleString("en-US")}. Recovery calculation shows nothing to cede.`,guard:`Header says "${header}". Actual: $${actual.toLocaleString("en-US")}. Held; recovery recalculated.`,hold:true}},
+  wrong:"A real reinsurance recovery never gets billed.",impact:"Estimate: depends on the layer; in the synthetic treaty, the difference between $8,900 and $8.9M."},
+ {id:"HG",title:"Duplicate claim with a look-alike name",code:"HOMOGLYPH_DUPLICATE",route:"SIU Analyst",
+  run(){const a="John Miller",b="Jon M\u0456ller";const naive=a===b;const sk=skeleton(a)===skeleton(b);
+   return{naive:`"${a}" and "${b}" look different to an exact match (${naive?"same":"different"}), so both claims proceed.`,guard:`Normalized with Unicode confusable mapping (the "i" in the second name is Cyrillic U+0456, and Jon maps to John): ${sk?"same person":"different"}. Same loss date and VIN tail 2291. Routed for a human look. Not a fraud finding.`,hold:sk&&!naive}},
+  wrong:"Paying the same loss twice.",impact:"Estimate: $14,200 duplicate payment in this synthetic case."},
+ {id:"DS",title:"03/04: March 4 or April 3?",code:"DATE_FORMAT_AMBIGUOUS",route:"Claims Adjuster",
+  run(){const raw="03/04/2026",src="broker portal (EU locale)";const us="2026-03-04",eu="2026-04-03",effective="2026-03-15";
+   return{naive:`Read as US: ${us}, before the ${effective} effective date, so the loss looks uncovered.`,guard:`Source is ${src}; ${raw} could be ${eu}. Both readings change the coverage answer. Held; ask the broker.`,hold:true}},
+  wrong:"A covered loss denied, or an uncovered one paid, on a date nobody actually checked.",impact:"Risk estimate: a wrongful denial complaint, or the full claim paid in error."},
+ {id:"PL",title:"Producer license expired before binding",code:"PRODUCER_LICENSE_LAPSED",route:"Producer Licensing Manager",
+  run(){const bound="2026-09-02",exp="2026-08-31";return{naive:`Producer is "active" in the agency system, so the commission pays.`,guard:`License record (synthetic) expired ${exp}; policy bound ${bound}. Held for licensing review.`,hold:bound>exp}},
+  wrong:"Commission paid to someone not licensed on the bind date, and a policy written through an unlicensed producer.",impact:"Risk estimate: regulatory exposure plus commission clawback."}];
 const PROPOSED_ACTION={type:"ISSUE_RETURN_PREMIUM",amount:4800,file:"PC-2026-0417",origin:"Text inside broker note [P6]"};
 const CARD={agent:"UW-Summary-Agent v0.3",owner:"Underwriting Operations Manager",escalateTo:"Underwriting Operations Manager (primary), Premium Accounting Supervisor (money movement)",
  allowed:["Read assigned submission files","Write a summary for an underwriter","Cite the source line for every sentence","Look up form editions in the forms library"],
@@ -122,17 +172,18 @@ function verifySentence(k,s,src){
  return{res:"SUPPORTED",why:`Every fact matches [${src}]`}}
 
 /* ---------- state + ledger ---------- */
-let S={step:0,done:new Set(),ledger:[],verify:null,holds:[],human:null,scen:{}};
+let S={step:0,done:new Set(),ledger:[],verify:null,holds:[],human:null,scen:{},cb:{},cbr:null};
 let clock=Date.parse("2026-10-12T14:30:00Z");
 function ts(){clock+=7000;return new Date(clock).toISOString().replace(".000Z","Z")}
 function log(actor,event,detail,cls="",ref=""){S.ledger.push({t:ts(),actor,event,detail,cls,ref});renderLedger()}
 function renderLedger(){const el=document.getElementById("ledger");if(!S.ledger.length){el.innerHTML='<div style="color:#5b6b78">No entries yet.</div>';return}
  el.innerHTML=S.ledger.map((e,i)=>`<div data-ev="${e.event}"><span style="color:#5b6b78">#${String(i+1).padStart(2,"0")} ${e.t}</span><br><b>${e.actor}</b> <span class="${e.cls}">${e.event}</span><br>${e.detail}${e.ref?`<br><span style="color:#5b6b78">Ref: ${e.ref}</span>`:""}</div>`).join("");el.scrollTop=el.scrollHeight}
-const STEPS=["1. Permission card","2. Summarize with sources","3. Second-pass verifier","4. Last year's form","5. Out-of-scope action","6. Watchlist: sneaky cases","Closer: Regulator asks"];
+const STEPS=["1. Permission card","2. Summarize with sources","3. Second-pass verifier","4. Last year's form","5. Out-of-scope action","6. Watchlist: sneaky cases","7. Curveballs","Closer: Regulator asks"];
 function nav(){document.getElementById("nav").innerHTML=STEPS.map((s,i)=>`<button class="${i===S.step?'on':''} ${S.done.has(i)?'done':''}" onclick="go(${i})">${s}</button>`).join("")}
 function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
 function docHtml(k,hl){let t=esc(FILES[k].text);t=t.replace("&lt;INJECT&gt;",'<span class="inj">').replace("&lt;/INJECT&gt;","</span>");
  if(hl)t=t.replace(`[${hl}]`,`<span class="hl">[${hl}]</span>`);return t}
+const HW_SVG=`<svg viewBox="0 0 320 90" width="100%" role="img" aria-label="Synthetic handwritten note"><rect width="320" height="90" fill="#fbf6e6" stroke="#d9cfa8"/><line x1="0" y1="62" x2="320" y2="62" stroke="#c9d6e8"/><text x="10" y="18" font-size="10" fill="#8a7d55" font-family="Arial">SYNTHETIC SCAN: adjuster margin note, CL-2026-1310</text><text x="14" y="56" font-size="30" fill="#24365e" font-family="'Segoe Script','Bradley Hand','Brush Script MT','Comic Sans MS',cursive" transform="rotate(-3 14 56)">reserve <tspan font-size="34">$</tspan><tspan font-size="34" dx="2">/</tspan><tspan font-size="34" dx="-6">-</tspan><tspan font-size="34" dx="-2">,500</tspan></text><text x="14" y="82" font-size="11" fill="#8a7d55" font-family="Arial">OCR: "$1,500" (confidence 0.58). Typed field: $7,500</text></svg>`;
 const SY='<span class="synth">SYNTHETIC SAMPLE DATA</span>';
 
 /* ---------- step runners ---------- */
@@ -158,7 +209,11 @@ function human5(dec){run5();if(S.human)return;S.human=dec;log("Human: Premium Ac
 function run6(){run5();if(!S.human)human5("reject");if(S.done.has(5))return;
  for(const c of SCEN){log("Watchlist","SUSPECTED: "+c.code,`${c.file}. ${c.signals.length} signals. System does not decide. Routed to ${c.route}.`,"l-hold",c.ref)}S.done.add(5)}
 function spot(id,dec){run6();if(S.scen[id])return;const c=SCEN.find(x=>x.id===id);S.scen[id]=dec;log("Human: "+c.route,dec==="confirm"?"SPOT-CHECK: CONCERN CONFIRMED, CASE OPENED":"SPOT-CHECK: CLEARED",`${c.file}. Decision made by a person, not the system.`,"l-ok",c.ref);render()}
-function run7(){run6();SCEN.forEach(c=>{if(!S.scen[c.id])spot(c.id,"confirm")});S.holds.forEach((h,i)=>{if(!h.resolved)resolveHold(i)});if(S.done.has(6))return;log("Compliance","EVIDENCE PACK GENERATED","Built from every ledger entry above","l-ok","NAIC Sec. 4 (Regulatory Oversight and Examination Considerations)");S.done.add(6)}
+function run7(){run6();SCEN.forEach(c=>{if(!S.scen[c.id])spot(c.id,"confirm")});if(S.done.has(6))return;S.cbr={};
+ for(const c of CB){const r=c.run();S.cbr[c.id]=r;log("Curveball check",(r.hold?"HELD: ":"PASSED: ")+c.code,`${c.title}. Naive check: ${r.naive} Guardrail: ${r.guard} Routed to ${c.route}.`,r.hold?"l-hold":"l-ok","NAIC AIS Program Guidelines 3.2 (data quality, integrity); 3.4 (testing); 2.3(d) (escalation)")}S.done.add(6)}
+function cbspot(id){run7();if(S.cb[id])return;const c=CB.find(x=>x.id===id);S.cb[id]=1;log("Human: "+c.route,"SPOT-CHECK DONE: "+c.code,`${c.title}. A person checked the original and decided.`,"l-ok","NAIC Sec. 3 risk consideration (iii)");render()}
+function cbAll(){CB.forEach(c=>cbspot(c.id))}
+function run8(){run7();CB.forEach(c=>{if(!S.cb[c.id])cbspot(c.id)});S.holds.forEach((h,i)=>{if(!h.resolved)resolveHold(i)});if(S.done.has(7))return;log("Compliance","EVIDENCE PACK GENERATED","Built from every ledger entry above","l-ok","NAIC Sec. 4 (Regulatory Oversight and Examination Considerations)");S.done.add(7)}
 
 /* ---------- views ---------- */
 const PILL={SUPPORTED:"p-ok",UNSUPPORTED:"p-bad",SUPERSEDED:"p-warn"},LBL={SUPPORTED:"SUPPORTED",UNSUPPORTED:"UNSUPPORTED",SUPERSEDED:"SUPPORTED BY A SUPERSEDED SOURCE"};
@@ -187,8 +242,14 @@ ${S.holds.map((h,i)=>`<div class="hold" style="margin-bottom:10px" data-hold="${
 <button class="go alt" id="next" onclick="go(5)">Next: the watchlist</button><p class="why">Maps to NAIC AIS Program Guidelines 3.1 (constraints and controls on automation) and 2.3(d) (monitoring, auditing, escalation, and reporting).</p></div>`},
 ()=>{run6();return `<div class="card"><h2>Step 6. Watchlist: when the system suspects something sneaky</h2><p class="why">Three cases where the system notices a pattern, says why, and hands it to a named person. It never decides the case. It never declares fraud.</p>
 ${SCEN.map(c=>`<div class="hold" style="margin-bottom:10px" data-scen="${c.id}"><b>${c.id}. ${c.title}</b> ${SY}<br><small>${c.file}</small><ul style="margin:6px 0">${c.signals.map(x=>`<li>${x}</li>`).join("")}</ul>Reason code: <b>${c.code}</b>. Routed to: <b>${c.route}</b>.${c.ctx?`<br><small style="color:#5b6b78">${c.ctx}</small>`:""}<br>${S.scen[c.id]?`<span class="pill p-ok">Human decision: ${S.scen[c.id]==="confirm"?"concern confirmed, case opened":"cleared"}</span>`:`<button class="go" onclick="spot('${c.id}','confirm')">${c.route}: confirm concern</button> <button class="go alt" onclick="spot('${c.id}','clear')">Clear it</button>`}</div>`).join("")}
-<button class="go alt" id="next" onclick="go(6)">Closer: the regulator asks</button><p class="why">Maps to NAIC Sec. 3 risk consideration (iii), the extent humans are involved in the final decision, and AIS Program Guidelines 2.3(d) escalation.</p></div>`},
-()=>{run7();return `<div class="card"><h2>Closer. "Show me every AI-assisted action on these files."</h2><p class="why">One click turns the ledger into an evidence pack. If it isn't in the ledger, it didn't happen, and that's the standard.</p>
+<button class="go alt" id="next" onclick="go(6)">Next: curveballs</button><p class="why">Maps to NAIC Sec. 3 risk consideration (iii), the extent humans are involved in the final decision, and AIS Program Guidelines 2.3(d) escalation.</p></div>`},
+()=>{run7();const R=S.cbr;return `<div class="card"><h2>Step 7. Curveballs that fool a QC check and a careful person</h2><p class="why">Nine traps. For each: what a naive check concluded, what the guardrail caught, what would have gone wrong, and who gets the spot-check. Every dollar figure here is a synthetic estimate.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px">${CB.map(c=>`<div class="hold" data-cb="${c.id}" style="padding:10px"><b>${c.title}</b> ${SY}${c.img?`<div style="margin:6px 0">${HW_SVG}</div>`:""}
+${c.id==="DT"?`<table style="font-size:12px;margin:4px 0"><tr><th>System A</th><th>System B</th><th>a === b</th><th>parseFloat(b)</th><th>Guardrail</th></tr>${R.DT.rows.map(x=>`<tr><td>"${x.a}"</td><td>"${x.b}"</td><td>${x.naiveEq}</td><td>${x.naiveParse}</td><td>${x.strict.v===x.strictA.v?"equal":"differ"}</td></tr>`).join("")}</table>`:""}
+<div style="font-size:13px"><span class="pill p-bad">Naive check</span> ${R[c.id].naive}<br><span class="pill p-ok">Guardrail</span> ${R[c.id].guard}<br><b>What would have gone wrong:</b> ${c.wrong}<br><b>Impact:</b> ${c.impact}<br>Reason code <b>${c.code}</b>. Routed to <b>${c.route}</b>.${c.id==="HG"?` <small>(Confusable mapping per <a href="${TR39}">Unicode TR39</a>.)</small>`:""}</div>
+${S.cb[c.id]?`<span class="pill p-ok">Spot-check done by a person</span>`:`<button class="go" style="padding:6px 10px;font-size:13px" onclick="cbspot('${c.id}')">${c.route.split(" (")[0]}: spot-check done</button>`}</div>`).join("")}</div>
+<p><button class="go alt" onclick="cbAll()">Mark all spot-checks done (presenter shortcut)</button> <button class="go alt" id="next" onclick="go(7)">Closer: the regulator asks</button></p></div>`},
+()=>{run8();return `<div class="card"><h2>Closer. "Show me every AI-assisted action on these files."</h2><p class="why">One click turns the ledger into an evidence pack. If it isn't in the ledger, it didn't happen, and that's the standard.</p>
 <button class="go" id="dl" onclick="downloadPack()">Download evidence pack (.html)</button> <button class="go alt" onclick="window.print()">Print this page</button>
 <div id="pack" style="margin-top:12px">${packHtml()}</div></div>`}];
 function showSrc(k,src){const d=document.getElementById("doc-"+k);d.style.display="block";d.innerHTML=docHtml(k,src);log("Reviewer","OPENED SOURCE",`${FILES[k].id} line [${src}]`)}
@@ -200,13 +261,14 @@ const MAP=[
  ["Verification and testing for errors","NAIC Sec. 3 (encourages verification and testing methods); AIS Program Guidelines 3.4","Second pass checked every fact against its cited line","Step 3"],
  ["Human involvement in the final decision","NAIC Sec. 3, risk consideration (iii)","Underwriter and supervisor decisions logged","Steps 4 and 5"],
  ["Human makes the call on suspected appetite conflicts, treaty gaps, and impersonation","NAIC Sec. 3, risk consideration (iii); AIS Program Guidelines 2.3(d)","Watchlist routed 3 cases with reason codes to named roles; system decided none","Step 6"],
+ ["Data quality and integrity checks on real-world messiness (handwriting, data types, rounding, time zones, units, look-alike names, dates, licensing, stale documents)","NAIC AIS Program Guidelines 3.2 and 3.4; Sec. 4 item 1.3(b)","9 curveballs held with reason codes and spot-checked by named roles","Step 7"],
  ["Data and record retention","NAIC AIS Program Guidelines 3.6","Ledger exported with this pack","Closer"],
  ["Documentation available on examination","NAIC Sec. 4, Regulatory Oversight and Examination Considerations, item 1.3","This pack","Closer"],
  ["Roles and responsibilities; testing and validation","Colorado 3 CCR 702-10 Sec. 5.A.6","Permission card roles; verifier","Steps 1 and 3"],
  ["Inventory with version control","Colorado 3 CCR 702-10 Sec. 5.A.9","Forms library and version holds","Step 4"],
  ["Framework available on request","Colorado 3 CCR 702-10 Sec. 5.C (life since Dec 1, 2024; private passenger auto and health since Jul 1, 2026). Applies only to the lines in Sec. 3 that use ECDIS (Sec. 4.D).","Same artifacts","All"]];
 function packHtml(){const blocks=S.ledger.filter(e=>/BLOCKED|HOLD|ESCALATED/.test(e.event)).length;
- return `<p><b>Evidence pack: UW-Summary-Agent v0.3, files PC-2026-0417, LF-2026-1188, RE-2026-0072</b> ${SY}<br>Generated from ${S.ledger.length} ledger entries. ${blocks} holds, blocks, or escalations. 0 dollars moved by the agent. ${SCEN.length} watchlist cases routed to people; 0 decided by the system.</p>
+ return `<p><b>Evidence pack: UW-Summary-Agent v0.3, files PC-2026-0417, LF-2026-1188, RE-2026-0072</b> ${SY}<br>Generated from ${S.ledger.length} ledger entries. ${blocks} holds, blocks, or escalations. 0 dollars moved by the agent. ${SCEN.length} watchlist cases routed to people; 0 decided by the system. ${CB.length} curveballs held and spot-checked by people.</p>
 <table><tr><th>Expectation</th><th>Exact section</th><th>What this run shows</th><th>Where</th></tr>${MAP.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table>
 <p style="font-size:12px;color:#5b6b78">Sources (accessed ${ACCESSED}):<br>${SRC.NAIC.name}: <a href="${SRC.NAIC.url}">${SRC.NAIC.url}</a><br>${SRC.CO.name}: <a href="${SRC.CO.url}">${SRC.CO.url}</a><br>Check your own state's adopted version. Teaching example, not legal advice.</p>
 <h3 style="font-size:15px">Full ledger</h3><table><tr><th>#</th><th>Time (UTC)</th><th>Actor</th><th>Event</th><th>Detail</th><th>Ref</th></tr>${S.ledger.map((e,i)=>`<tr><td>${i+1}</td><td>${e.t}</td><td>${e.actor}</td><td>${e.event}</td><td>${e.detail}</td><td>${e.ref}</td></tr>`).join("")}</table>`}
@@ -215,6 +277,6 @@ function downloadPack(){const html=`<!doctype html><meta charset="utf-8"><title>
 function go(i){S.step=i;history.replaceState(null,"","#step"+(i+1));render();window.scrollTo(0,0)}
 function render(){nav();document.getElementById("stage").innerHTML=V[S.step]()+`<div class="card"><button class="go alt" onclick="resetAll()">Reset demo</button></div>`;nav();renderLedger()}
 function resetAll(){history.replaceState(null,"",location.pathname);location.reload()}
-const m=location.hash.match(/step(\d)/);S.step=m?Math.min(6,+m[1]-1):0;render();
-window.__FR={S};
+const m=location.hash.match(/step(\d)/);S.step=m?Math.min(7,+m[1]-1):0;render();
+window.__FR={S};document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='ArrowRight'&&S.step<7)go(S.step+1);if(e.key==='ArrowLeft'&&S.step>0)go(S.step-1)});
 </script></body></html>

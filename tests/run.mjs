@@ -4,7 +4,7 @@ const ROOT='/workspace/gis-2027/flight-recorder', SHOTS=ROOT+'/screenshots';
 const modes=(process.env.MODES||'file,server').split(',');
 const SAFARI='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15';
 const EDGE='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0';
-const cfgs=[['mac-safari-1440x900',webkit,SAFARI,1440,900],['mac-safari-1280x800',webkit,SAFARI,1280,800],['win-edge-1920x1080',chromium,EDGE,1920,1080],['win-edge-1366x768',chromium,EDGE,1366,768],['firefox-1440x900',firefox,null,1440,900]];
+const cfgs=[['mac-safari-1440x900',webkit,SAFARI,1440,900],['mac-safari-1280x800',webkit,SAFARI,1280,800],['win-edge-1920x1080',chromium,EDGE,1920,1080],['win-edge-1366x768',chromium,EDGE,1366,768],['firefox-1440x900',firefox,null,1440,900],['firefox-1366x768',firefox,null,1366,768]];
 const srv=http.createServer((q,r)=>{let f=path.join(ROOT,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':f.endsWith('.html')?'text/html':'application/octet-stream'});r.end(d)})}).listen(8765);
 const URLS={file:'file://'+ROOT+'/index.html',server:'http://localhost:8765/',pages:'https://nathanplatteruser.github.io/gis-2027/flight-recorder/'};
 const results=[];
@@ -28,10 +28,13 @@ for(const [name,bt,ua,w,h] of cfgs)for(const mode of modes){
   await p.click('#next');r.checks.step6=(await p.locator('[data-scen]').count())===3;
   for(let i=0;i<3;i++)await p.locator('[data-scen] button.go:not(.alt)').first().click();
   r.checks.step6_human=(await p.locator('[data-scen] button').count())===0&&await p.locator('#ledger >> text=SUSPECTED: IMPERSONATION_SIGNALS').isVisible();await shot(6);
-  await p.click('#next');r.checks.closer=await p.getByRole('cell',{name:'Colorado 3 CCR 702-10 Sec. 5.A.9',exact:true}).isVisible();
+  await p.click('#next');r.checks.step7=(await p.locator('[data-cb]').count())===9&&(await p.locator('#ledger >> text=HELD: PRECISION_DRIFT').count())===1&&await p.locator('[data-cb=RD]').getByText('drifts $10.00').isVisible();
+  while(await p.locator('[data-cb] button').count())await p.locator('[data-cb] button').first().click();
+  r.checks.step7_human=(await p.locator('text=Spot-check done by a person').count())===9;await shot(7);
+  await p.keyboard.press('ArrowRight');r.checks.closer=await p.getByRole('cell',{name:'Colorado 3 CCR 702-10 Sec. 5.A.9',exact:true}).isVisible();
   const [dl]=await Promise.all([p.waitForEvent('download',{timeout:8000}),p.click('#dl')]);const fp=`${dir}/evidence-pack.html`;await dl.saveAs(fp);
-  const txt=fs.readFileSync(fp,'utf8');r.checks.download=txt.includes('ESCALATED')&&txt.includes('AIS Program Guidelines 3.1')&&txt.includes('accessed 2026-10-12')&&txt.includes('TREATY_TERRITORY_GAP');await shot(7);
+  const txt=fs.readFileSync(fp,'utf8');r.checks.download=txt.includes('ESCALATED')&&txt.includes('AIS Program Guidelines 3.1')&&txt.includes('accessed 2026-10-12')&&txt.includes('TREATY_TERRITORY_GAP')&&txt.includes('HOMOGLYPH_DUPLICATE');await shot(8);
  }catch(e){r.errors.push(String(e).slice(0,300))}
- r.pass=Object.values(r.checks).every(Boolean)&&Object.keys(r.checks).length===12&&!r.errors.length;results.push(r);console.log(name,mode,r.pass?'PASS':'FAIL',JSON.stringify(r.checks),r.errors.join(' | '));
+ r.pass=Object.values(r.checks).every(Boolean)&&Object.keys(r.checks).length===14&&!r.errors.length;results.push(r);console.log(name,mode,r.pass?'PASS':'FAIL',JSON.stringify(r.checks),r.errors.join(' | '));
  await b.close()}
 fs.writeFileSync(`results-${modes.join('-')}.json`,JSON.stringify(results,null,1));srv.close();

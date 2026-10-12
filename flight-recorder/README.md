@@ -6,14 +6,15 @@ A free, offline walkthrough of a governed AI workflow for insurance. It shows fi
 
 **Everything in the policy files is SYNTHETIC SAMPLE DATA.** See [DATA-SOURCES.md](DATA-SOURCES.md) for exactly what's invented and what's public. The "agent" is scripted, so the demo runs the same way every time with no internet, no account, and no model. Swap in any model your company approves. The guardrails are the point, not the model.
 
-## What you'll see (about 15 minutes)
+## What you'll see (about 18 minutes)
 1. **Permission card.** What the agent may do, what it may never do, and who answers for it.
 2. **Summaries with sources.** Three files (P&C commercial property, individual life, property cat reinsurance). Every sentence carries a source tag you can click.
 3. **Second-pass verifier.** A separate check opens each cited line and confirms every number and term is there. Unsupported sentences come out. Sentences that rest on a replaced form are marked "supported by a superseded source."
 4. **Last year's form.** Every form, rider, and clause reference is checked against a forms library, with or without an edition date. A retired edition (EB-204) and an undated clause (HC-3) are held until an underwriter confirms the current version.
 5. **Out-of-scope action.** An instruction hidden in a broker note asks the agent to issue a $4,800 return premium. The gate blocks it, logs it, and escalates to named roles.
 6. **Watchlist: sneaky cases.** Three scenario cards where the system suspects something and pulls in a named person: (a) a state market exit, so the file conflicts with current appetite and filings (to the regional Underwriting Manager); (b) a reinsurer that excluded a state the primary still writes, so the ceded share may be uncovered (to the Ceded Reinsurance Manager); (c) impersonation signals such as a callback mismatch, video metadata dated before the loss, a look-alike approval email, and the same device and bank account across three claims (to an SIU Analyst). Reason codes on every card. The system never decides and never declares fraud.
-7. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
+7. **Curveballs.** Nine traps that fool a QC check and a careful person, each with a naive result, the guardrail result, what would have gone wrong, an estimated impact, a reason code, and a named reviewer: a handwritten margin edit OCR misread ($1,500 vs $7,500), amounts stored as text (European format, scientific notation, trailing space, dropped leading zero), rounding drift ($0.005 x 2,000 lines = $10), a stale privacy notice ranked first by search, a loss 3 minutes before coverage hidden by UTC, a treaty schedule in thousands, a duplicate claim with a look-alike name (Cyrillic letter), a 03/04 date that could be March or April, and a producer license that expired before binding.
+8. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
 
 ## Run it
 No install needed.
@@ -28,11 +29,11 @@ py -m http.server 8000           # Windows
 ```
 Then open http://localhost:8000.
 
-Jump straight to a step by adding `#step1` through `#step7` to the address. "Reset demo" starts over.
+Use the left and right arrow keys to move between steps. Jump straight to a step by adding `#step1` through `#step8` to the address. "Reset demo" starts over.
 
 ## Files
 - `index.html` the whole demo, one file
-- `takehomes/` permission-card template and pilot-to-production checklist
+- `takehomes/` permission-card template, pilot-to-production checklist, and curveball checklist
 - `docs/run-of-show.md` presenter timing, `docs/video-script.md` short walkthrough script
 - `screenshots/` one image per step
 

@@ -1,4 +1,4 @@
-# Walkthrough video script (about 5 minutes)
+# Walkthrough video script (about 6 minutes)
 
 **Open (on title).** Hi, I'm Nathan. I've spent about 15 years in data and analytics, and I used to hold P&C, life, and health licenses. This is a short walkthrough of a pattern I use to move AI from pilot to production without losing track of who did what. Everything you'll see is synthetic sample data, and the code is free.
 
@@ -13,6 +13,8 @@
 **Step 5.** Someone tucked an instruction into a broker note: issue a $4,800 return premium. The agent proposed it. The gate blocked it, logged it, and paged the two people who own that decision. No money moved.
 
 **Step 6.** Some cases just smell off. A quote in a state where we've stopped writing that line. A treaty where the reinsurer dropped a state we still write. A claimant whose callback number reaches someone else, a video recorded before the loss, and the same bank account on three claims. The system doesn't decide any of these. It lists the signals, gives a reason code, and hands it to a named person. It never says fraud.
+
+**Step 7.** Now the curveballs, the stuff that fools a check and a careful person. A handwritten seven the scanner reads as a one. An amount written the European way that a computer quietly turns into twelve dollars and fifty cents. Half a cent of rounding that becomes ten dollars over two thousand lines. A loss three minutes before the policy started that looks covered because the system logged it in UTC. A schedule in thousands. The same claimant with one letter swapped for a look-alike. Each one is held, explained, and handed to a named person. Every dollar figure is an estimate on made-up data.
 
 **Closer.** If a regulator asks what happened on these files, one click builds the evidence pack from the log, mapped to the NAIC model bulletin and Colorado's rule.
 
