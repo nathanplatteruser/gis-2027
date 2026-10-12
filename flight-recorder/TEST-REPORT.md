@@ -1,11 +1,11 @@
-# Test report (v1.2)
+# Test report (v1.4)
 
 **This is browser emulation, not real hardware.** Tests ran on one Linux machine using Playwright browser engines. "Mac Safari" means the WebKit engine with a macOS Safari user agent and window size. "Windows Edge" means the Chromium engine with a Windows Edge user agent and window size. Firefox is the Gecko engine. This catches layout and logic breaks; it does not replace opening the demo on a real Mac or Windows PC.
 
 Date: 2026-10-12. Script: `tests/run.mjs`.
 
-## What each run checks (14 checks)
-step1 card; step2 source tags and SYNTHETIC labels; step2_source click highlights the line; step3 exactly 3 unsupported and 2 superseded; step4_holds 2 holds (EB-204 retired, HC-3 undated); step4_resolved; step5 BLOCKED and ESCALATED; step5_human; step6 three watchlist cards; step6_human three spot-checks logged; step7 nine curveball cards, PRECISION_DRIFT held and $10.00 drift shown; step7_human nine spot-checks; closer reached with the right-arrow key and Colorado 5.A.9 row present; download evidence pack saved and contains ESCALATED, NAIC 3.1, the access date, TREATY_TERRITORY_GAP and HOMOGLYPH_DUPLICATE.
+## What each run checks (23 checks)
+intake shown with the stays-in-this-browser note; skip logs PROFILE SET as ledger entry #1 and shows the Tailored for chip; step1; step2 source tags and SYNTHETIC labels; step2_source; step3 3 unsupported and 2 superseded; step4_holds; step4_resolved; step5 BLOCKED and ESCALATED; step5_human; step6 three watchlist cards; step6_human; step7 4 presenter picks and PRECISION_DRIFT held; step7_filter Reinsurance shows 4 incl. WH; step7_all 27 cards and the $10.00 drift; step7_human run-all plus 27 spot-checks; closer via right arrow with Colorado 5.A.9; download evidence pack with ESCALATED, NAIC 3.1, the access date, the new reason codes and the audience profile; persona_exec (Executive, P&C, plain: lens, impact summary, details collapsed, no raw values, DP pick, scorecard); persona_mgr (Manager, Reinsurance, technical: workload table, WH pick, no impact summary); persona_prac (Practitioner, Workers' Comp, technical: 4 raw-value blocks, WC pick); change (switch to Executive, Life/Health mid-demo on step 7: LC pick, PROFILE CHANGED logged once after one PROFILE SET); arrows (left arrow from step 1 opens the intake, right arrow resumes, then advances).
 
 ## Results
 | Platform (emulated) | Mode | Result | Checks | Errors |
