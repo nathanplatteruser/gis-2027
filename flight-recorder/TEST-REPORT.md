@@ -22,7 +22,12 @@ step1 card; step2 source tags and SYNTHETIC labels; step2_source click highlight
 | firefox-1440x900 | server | PASS | 14/14 | none |
 | firefox-1366x768 | file | PASS | 14/14 | none |
 | firefox-1366x768 | server | PASS | 14/14 | none |
-PAGES_ROWS
+| mac-safari-1440x900 | pages (GitHub Pages URL) | PASS | 14/14 | none |
+| mac-safari-1280x800 | pages (GitHub Pages URL) | PASS | 14/14 | none |
+| win-edge-1920x1080 | pages (GitHub Pages URL) | PASS | 14/14 | none |
+| win-edge-1366x768 | pages (GitHub Pages URL) | PASS | 14/14 | none |
+| firefox-1440x900 | pages (GitHub Pages URL) | PASS | 14/14 | none |
+| firefox-1366x768 | pages (GitHub Pages URL) | PASS | 14/14 | none |
 
 Screenshots per platform: `screenshots/<platform>/step1.png` to `step8.png` (file mode).
 
