@@ -10,24 +10,24 @@ step1 card; step2 source tags and SYNTHETIC labels; step2_source click highlight
 ## Results
 | Platform (emulated) | Mode | Result | Checks | Errors |
 |---|---|---|---|---|
-| mac-safari-1440x900 | file | PASS | 16/16 | none |
-| mac-safari-1440x900 | server | PASS | 16/16 | none |
-| mac-safari-1280x800 | file | PASS | 16/16 | none |
-| mac-safari-1280x800 | server | PASS | 16/16 | none |
-| win-edge-1920x1080 | file | PASS | 16/16 | none |
-| win-edge-1920x1080 | server | PASS | 16/16 | none |
-| win-edge-1366x768 | file | PASS | 16/16 | none |
-| win-edge-1366x768 | server | PASS | 16/16 | none |
-| firefox-1440x900 | file | PASS | 16/16 | none |
-| firefox-1440x900 | server | PASS | 16/16 | none |
-| firefox-1366x768 | file | PASS | 16/16 | none |
-| firefox-1366x768 | server | PASS | 16/16 | none |
-| mac-safari-1440x900 | pages (GitHub Pages URL) | PASS | 16/16 | none |
-| mac-safari-1280x800 | pages (GitHub Pages URL) | PASS | 16/16 | none |
-| win-edge-1920x1080 | pages (GitHub Pages URL) | PASS | 16/16 | none |
-| win-edge-1366x768 | pages (GitHub Pages URL) | PASS | 16/16 | none |
-| firefox-1440x900 | pages (GitHub Pages URL) | PASS | 16/16 | none |
-| firefox-1366x768 | pages (GitHub Pages URL) | PASS | 16/16 | none |
+| mac-safari-1440x900 | file | PASS | 23/23 | none |
+| mac-safari-1440x900 | server | PASS | 23/23 | none |
+| mac-safari-1280x800 | file | PASS | 23/23 | none |
+| mac-safari-1280x800 | server | PASS | 23/23 | none |
+| win-edge-1920x1080 | file | PASS | 23/23 | none |
+| win-edge-1920x1080 | server | PASS | 23/23 | none |
+| win-edge-1366x768 | file | PASS | 23/23 | none |
+| win-edge-1366x768 | server | PASS | 23/23 | none |
+| firefox-1440x900 | file | PASS | 23/23 | none |
+| firefox-1440x900 | server | PASS | 23/23 | none |
+| firefox-1366x768 | file | PASS | 23/23 | none |
+| firefox-1366x768 | server | PASS | 23/23 | none |
+| mac-safari-1440x900 | pages (GitHub Pages URL) | PASS | 23/23 | none |
+| mac-safari-1280x800 | pages (GitHub Pages URL) | PASS | 23/23 | none |
+| win-edge-1920x1080 | pages (GitHub Pages URL) | PASS | 23/23 | none |
+| win-edge-1366x768 | pages (GitHub Pages URL) | PASS | 23/23 | none |
+| firefox-1440x900 | pages (GitHub Pages URL) | PASS | 23/23 | none |
+| firefox-1366x768 | pages (GitHub Pages URL) | PASS | 23/23 | none |
 
 Screenshots per platform: `screenshots/<platform>/step1.png` to `step8.png` (file mode).
 
