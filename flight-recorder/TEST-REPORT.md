@@ -20,7 +20,11 @@ step1 card visible; step2 source tags and SYNTHETIC labels; step2_source click h
 | win-edge-1366x768 | server | PASS | 12/12 | none |
 | firefox-1440x900 | file | PASS | 12/12 | none |
 | firefox-1440x900 | server | PASS | 12/12 | none |
-PAGES_ROWS
+| mac-safari-1440x900 | pages (GitHub Pages URL) | PASS | 12/12 | none |
+| mac-safari-1280x800 | pages (GitHub Pages URL) | PASS | 12/12 | none |
+| win-edge-1920x1080 | pages (GitHub Pages URL) | PASS | 12/12 | none |
+| win-edge-1366x768 | pages (GitHub Pages URL) | PASS | 12/12 | none |
+| firefox-1440x900 | pages (GitHub Pages URL) | PASS | 12/12 | none |
 
 Screenshots per platform: `screenshots/<platform>/step1.png` to `step7.png` (file mode).
 
