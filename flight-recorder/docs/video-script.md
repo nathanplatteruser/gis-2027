@@ -19,3 +19,6 @@
 **Closer.** If a regulator asks what happened on these files, one click builds the evidence pack from the log, mapped to the NAIC model bulletin and Colorado's rule.
 
 **Close.** The permission card, a 10-question checklist, and the code are all in the repo. Use them, change them, and let me know what you'd add.
+
+## Step 7 update (v1.3)
+"There are 27 of these, in nine categories. I'll show four. Handwriting. Depreciation math, where the naive check comes up about $2,560 short on a synthetic claim. An auth that's on file and gets denied anyway. And a time zone that moves a date. Every one gets held, gets a reason code, and goes to a named person. The system never decides. Here's the ledger."

@@ -16,3 +16,6 @@ Setup: open `index.html` full screen. Ledger visible on the right. Have the take
 | 17:00 to 18:00 | Take-homes | Permission card, 10-question checklist, curveball checklist, free code. "Run it Monday on a laptop with your own sample files." |
 
 Backup: if the screen fails, the eight screenshots tell the same story in order. Arrow keys move between steps; `#step1` to `#step8` jumps directly.
+
+## Step 7 update (v1.3)
+Stay on Presenter picks: handwriting (HW), depreciation math (DP), auth on file denied anyway (AU), time zone (TZ). That takes about 3 minutes. If someone asks "what about X", click that category chip. Click "Re-run all checks" only if there's time; it reruns all 27 and logs it. Close by clicking "Mark all spot-checks done" and pointing at the ledger: every spot-check has a person's name on it.

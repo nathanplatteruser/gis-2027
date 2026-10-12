@@ -28,13 +28,15 @@ for(const [name,bt,ua,w,h] of cfgs)for(const mode of modes){
   await p.click('#next');r.checks.step6=(await p.locator('[data-scen]').count())===3;
   for(let i=0;i<3;i++)await p.locator('[data-scen] button.go:not(.alt)').first().click();
   r.checks.step6_human=(await p.locator('[data-scen] button').count())===0&&await p.locator('#ledger >> text=SUSPECTED: IMPERSONATION_SIGNALS').isVisible();await shot(6);
-  await p.click('#next');r.checks.step7=(await p.locator('[data-cb]').count())===9&&(await p.locator('#ledger >> text=HELD: PRECISION_DRIFT').count())===1&&await p.locator('[data-cb=RD]').getByText('drifts $10.00').isVisible();
-  while(await p.locator('[data-cb] button').count())await p.locator('[data-cb] button').first().click();
-  r.checks.step7_human=(await p.locator('text=Spot-check done by a person').count())===9;await shot(7);
+  await p.click('#next');r.checks.step7=(await p.locator('[data-cb]').count())===4&&(await p.locator('#ledger >> text=HELD: PRECISION_DRIFT').count())===1;
+  await p.click('[data-chip="Reinsurance"]');r.checks.step7_filter=(await p.locator('[data-cb]').count())===4&&(await p.locator('[data-cb=WH]').count())===1;
+  await p.click('[data-chip="All"]');r.checks.step7_all=(await p.locator('[data-cb]').count())===27&&await p.locator('[data-cb=RD]').getByText('drifts $10.00').isVisible();
+  await p.locator('[data-cb=AU] button.spot').click();await p.click('#runall');await p.click('#markall');
+  r.checks.step7_human=(await p.locator('text=Spot-check done by a person').count())===27&&(await p.locator('#ledger >> text=SPOT-CHECK DONE: AUTH_ON_FILE_UNMATCHED').count())===1;await shot(7);
   await p.keyboard.press('ArrowRight');r.checks.closer=await p.getByRole('cell',{name:'Colorado 3 CCR 702-10 Sec. 5.A.9',exact:true}).isVisible();
   const [dl]=await Promise.all([p.waitForEvent('download',{timeout:8000}),p.click('#dl')]);const fp=`${dir}/evidence-pack.html`;await dl.saveAs(fp);
-  const txt=fs.readFileSync(fp,'utf8');r.checks.download=txt.includes('ESCALATED')&&txt.includes('AIS Program Guidelines 3.1')&&txt.includes('accessed 2026-10-12')&&txt.includes('TREATY_TERRITORY_GAP')&&txt.includes('HOMOGLYPH_DUPLICATE');await shot(8);
+  const txt=fs.readFileSync(fp,'utf8');r.checks.download=txt.includes('ESCALATED')&&txt.includes('AIS Program Guidelines 3.1')&&txt.includes('accessed 2026-10-12')&&txt.includes('TREATY_TERRITORY_GAP')&&txt.includes('HOMOGLYPH_DUPLICATE')&&txt.includes('HIDDEN_TEXT_IN_DOCUMENT')&&txt.includes('TREATY_NOTICE_DUE');await shot(8);
  }catch(e){r.errors.push(String(e).slice(0,300))}
- r.pass=Object.values(r.checks).every(Boolean)&&Object.keys(r.checks).length===14&&!r.errors.length;results.push(r);console.log(name,mode,r.pass?'PASS':'FAIL',JSON.stringify(r.checks),r.errors.join(' | '));
+ r.pass=Object.values(r.checks).every(Boolean)&&Object.keys(r.checks).length===16&&!r.errors.length;results.push(r);console.log(name,mode,r.pass?'PASS':'FAIL',JSON.stringify(r.checks),r.errors.join(' | '));
  await b.close()}
 fs.writeFileSync(`results-${modes.join('-')}.json`,JSON.stringify(results,null,1));srv.close();

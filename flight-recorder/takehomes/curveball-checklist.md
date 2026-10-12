@@ -1,18 +1,38 @@
-# Curveball checklist: nine things that fool a QC check and a careful reviewer
+# Curveball checklist: 27 things that fool a QC check and a careful reviewer
 
-Run these against any AI-assisted workflow before you trust it. Each one is in the Flight Recorder demo on synthetic data.
+Every card in step 7 shows the naive result, what the guardrail caught, the impact (labeled as an estimate), a reason code, the named reviewer, and a spot-check button. All data on the cards is synthetic. The context links are real public sources describing the friction, not sources for the synthetic numbers.
 
-| # | Ask | Guardrail |
-|---|---|---|
-| 1 | Does any handwriting or scanned edit feed a number? | Hold when OCR confidence is low or the read disagrees with a typed field. A person reads the original. |
-| 2 | Are amounts or IDs ever stored as text? | Parse with the source's format (1,234.56 vs 1.234,56; 1.25E4; spaces). Keep policy numbers as text so leading zeros survive. |
-| 3 | Do two systems round differently? | Reconcile in exact cents and flag any total gap, even a few dollars. |
-| 4 | Can search pull last year's notice, form, or bulletin? | Check effective dates and version lineage, not just the search rank. |
-| 5 | What time zone is the loss time in? | Convert to the time basis the policy states before comparing to inception or expiry. |
-| 6 | Does a schedule say "in thousands"? | Read units from headers and footers before any math. |
-| 7 | Could two names be the same person with a look-alike character? | Normalize names (Unicode confusables, nicknames) before duplicate checks. |
-| 8 | Is 03/04 March or April? | Know the source locale; hold when both readings change the answer. |
-| 9 | Was the producer licensed and appointed on the bind date? | Check the license record by date, not the "active" flag. |
+Presenter picks: HW, DP, AU, TZ.
 
-Every hold gets a reason code, a ledger entry, and a named person. The system flags; a person decides.
-Reference: NAIC AI Model Bulletin, Sec. 3 AIS Program Guidelines 3.2 and 3.4 (accessed 2026-10-12): https://content.naic.org/sites/default/files/cmte-h-big-data-artificial-intelligence-wg-ai-model-bulletin.pdf.pdf
+| ID | Curveball | Category | Public friction context |
+|---|---|---|---|
+| HW | Handwritten amount misread | Claims | [J.D. Power 2025 property claims study](https://www.jdpower.com/business/press-releases/2025-us-property-claims-satisfaction-study) |
+| TZ | Time zone date shift | Claims | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| CC | Claim acknowledgment clock | Claims | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| DP | Depreciation math | Claims | [r/adjusters thread on ACV vs RCV](https://www.reddit.com/r/adjusters/comments/1g3vwy3/home_insurance_estimate_replacement_cost_value/) |
+| MT | Matching siding | Claims | [IRMI on matching](https://www.irmi.com/articles/expert-commentary/matching-problem-in-property-insurance-claims) |
+| RD | Rounding drift | Payments and Billing | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| SB | Deductible owed after subrogation | Payments and Billing | [MWL on deductible reimbursement](https://www.mwl-law.com/under-deductible-subrogation-deductible-reimbursement-helping-insureds-battle-the-cost-of-insurance/) |
+| PP | Late payment after settlement | Payments and Billing | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| PB | Premium increase or double billing | Payments and Billing | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| SC | Stale compliance doc | Underwriting and Policy | [Illinois 2025 complaint ratio report](https://idoi.illinois.gov/content/dam/soi/en/web/insurance/reports/reports/2025-complaint-ratio-report.pdf) |
+| PL | Prompt-like text in a note | Underwriting and Policy | [Illinois 2025 complaint ratio report](https://idoi.illinois.gov/content/dam/soi/en/web/insurance/reports/reports/2025-complaint-ratio-report.pdf) |
+| PI | Policy identifier mismatch | Underwriting and Policy | [Washington OIC premium increase transparency](https://www.insurance.wa.gov/about-us/current-initiatives/premium-increase-transparency/insurers-need-explain-premium-increases) |
+| AU | Auth on file, denied anyway | Health/Auth | [KFF prior authorization metrics](https://www.kff.org/patient-consumer-protections/prior-authorization-metrics-provide-new-insights-into-insurer-practices-but-gaps-remain/) |
+| LC | Life contestability with name/DOB mismatch | Life | [WSJ on the contestability period](https://www.wsj.com/buyside/personal-finance/life-insurance/life-insurance-contestability-period?eafs_enabled=) |
+| AN | Annuity suitability | Life | [Connecticut 2025 complaint activity report](https://portal.ct.gov/cid/-/media/cid/reports/complaint-rankings/2025-annual-complaints-activity-reports.pdf?hash=00FA51C9A4900C29B31216DB994C962B&rev=d57e43b0742049acb73937483525f24b) |
+| WC | Workers' comp date-of-injury mismatch | Workers' Comp | [Minnesota DLI 2026 workers' comp report](https://dli.mn.gov/sites/default/files/pdf/wcfact26.pdf) |
+| UN | Unit mix-up | Reinsurance | [Lloyd's Coverholder Reporting Standards v5.1](https://assets.lloyds.com/media/8b074f5e-61c8-4e14-876e-ad8cd1264614/Y5199---Lloyd%E2%80%99s-Coverholder-Reporting-Standards-Version-5.1.pdf) |
+| TN | Treaty notice missed | Reinsurance | [Fifth Circuit 2025 late-notice opinion](https://www.ca5.uscourts.gov/opinions/pub/24/24-10392-CV0.pdf) |
+| WH | Wildfire hours clause | Reinsurance | [Artemis on wildfire hours clauses](https://www.artemis.bm/news/hours-clause-questions-raised-over-california-wildfire-reinsurance-claims/) |
+| BX | Late MGA bordereaux | Reinsurance | [Lloyd's Coverholder Reporting Standards v5.1](https://assets.lloyds.com/media/8b074f5e-61c8-4e14-876e-ad8cd1264614/Y5199---Lloyd%E2%80%99s-Coverholder-Reporting-Standards-Version-5.1.pdf) |
+| HG | Homoglyph duplicate | Fraud and Identity | [Unicode TR39 confusables](https://www.unicode.org/reports/tr39/) |
+| PH | AI photo provenance (route to SIU, never call it fraud) | Fraud and Identity | [Verisk State of Insurance Fraud study](https://www.verisk.com/49411b/siteassets/media/campaigns/gated/claims/verisk-state-of-insurance-fraud-study.pdf) |
+| OF | Sanctions-style near-match (fictional names) | Fraud and Identity | [U.S. Treasury OFAC SDN list (what real screening uses)](https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists) |
+| WT | Hidden white text in a PDF | Fraud and Identity | [Verisk State of Insurance Fraud study](https://www.verisk.com/49411b/siteassets/media/campaigns/gated/claims/verisk-state-of-insurance-fraud-study.pdf) |
+| DT | Data type mismatch | Data Quirks | [Lloyd's Coverholder Reporting Standards v5.1](https://assets.lloyds.com/media/8b074f5e-61c8-4e14-876e-ad8cd1264614/Y5199---Lloyd%E2%80%99s-Coverholder-Reporting-Standards-Version-5.1.pdf) |
+| DS | Duplicate submission | Data Quirks | [NAIC complaint reasons](https://eapps.naic.org/documents/cis_aggregate_complaints_by_reason_codes.pdf) |
+| CP | Copy-paste totals | Data Quirks | [Lloyd's Coverholder Reporting Standards v5.1](https://assets.lloyds.com/media/8b074f5e-61c8-4e14-876e-ad8cd1264614/Y5199---Lloyd%E2%80%99s-Coverholder-Reporting-Standards-Version-5.1.pdf) |
+
+## Use it on your own pipeline
+For each row, ask: would our check hold this, who reviews it, and does the hold land in a log someone can replay?

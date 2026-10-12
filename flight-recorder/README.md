@@ -16,6 +16,9 @@ A free, offline walkthrough of a governed AI workflow for insurance. It shows fi
 7. **Curveballs.** Nine traps that fool a QC check and a careful person, each with a naive result, the guardrail result, what would have gone wrong, an estimated impact, a reason code, and a named reviewer: a handwritten margin edit OCR misread ($1,500 vs $7,500), amounts stored as text (European format, scientific notation, trailing space, dropped leading zero), rounding drift ($0.005 x 2,000 lines = $10), a stale privacy notice ranked first by search, a loss 3 minutes before coverage hidden by UTC, a treaty schedule in thousands, a duplicate claim with a look-alike name (Cyrillic letter), a 03/04 date that could be March or April, and a producer license that expired before binding.
 8. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
 
+## Step 7: curveballs (v1.3)
+27 curveballs in 9 categories: Claims, Payments and Billing, Underwriting and Policy, Health/Auth, Life, Workers' Comp, Reinsurance, Fraud and Identity, Data Quirks. Filter chips switch categories. The default view is Presenter picks (HW, DP, AU, TZ). "Re-run all checks" and "Mark all spot-checks done" handle the full set. Every hold and spot-check is written to the ledger with its category, and all 27 appear in the evidence pack. Full list: [takehomes/curveball-checklist.md](takehomes/curveball-checklist.md). Background research: [../research/](../research/).
+
 ## Run it
 No install needed.
 
