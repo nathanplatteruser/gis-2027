@@ -19,3 +19,10 @@ Backup: if the screen fails, the eight screenshots tell the same story in order.
 
 ## Step 7 update (v1.3)
 Stay on Presenter picks: handwriting (HW), depreciation math (DP), auth on file denied anyway (AU), time zone (TZ). That takes about 3 minutes. If someone asks "what about X", click that category chip. Click "Re-run all checks" only if there's time; it reruns all 27 and logs it. Close by clicking "Mark all spot-checks done" and pointing at the ledger: every spot-check has a person's name on it.
+
+## Step 0 first (v1.4, adds about 30 seconds)
+Open the page; it starts on Step 0. Hand the clicker to someone in the front row, or read the five questions aloud and take the room's majority. If the room is mixed, tap "Skip, show me everything."
+
+Switching profiles live (good for Q&A): click "change" next to the Tailored for chip, tap five answers, and you land back on the same step. Try it on step 7. Switch an executive to Reinsurance and the presenter picks become hours clause, treaty notice, bordereaux and units. Then say: "Notice the ledger logged that I changed the audience. Even that's on the record." The left arrow from step 1 also reopens the intake.
+
+Suggested live switch: start Executive for the main run, then on step 7 switch to Practitioner to show the raw values behind the same cards.

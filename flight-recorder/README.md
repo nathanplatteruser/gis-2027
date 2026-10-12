@@ -16,6 +16,16 @@ A free, offline walkthrough of a governed AI workflow for insurance. It shows fi
 7. **Curveballs.** Nine traps that fool a QC check and a careful person, each with a naive result, the guardrail result, what would have gone wrong, an estimated impact, a reason code, and a named reviewer: a handwritten margin edit OCR misread ($1,500 vs $7,500), amounts stored as text (European format, scientific notation, trailing space, dropped leading zero), rounding drift ($0.005 x 2,000 lines = $10), a stale privacy notice ranked first by search, a loss 3 minutes before coverage hidden by UTC, a treaty schedule in thousands, a duplicate claim with a look-alike name (Cyrillic letter), a 03/04 date that could be March or April, and a producer license that expired before binding.
 8. **Closer: the regulator asks.** One click builds an evidence pack from the ledger, mapped to the NAIC AI Model Bulletin and Colorado 3 CCR 702-10.
 
+## Step 0: quick intake (v1.4)
+Five one-tap questions (about 10 seconds) before the permission card: role, AI familiarity, closeness to the raw data, line of business, and what you want to see. Or tap "Skip, show me everything." The answers set a profile:
+- **Executive view** (C-suite, VP): a bottom line and "what would have happened" on each step, a dollar impact summary on step 7 with card details collapsed, and an executive scorecard at the end.
+- **Manager view** (Director, Manager): who gets escalated, team workload by reviewer role, and checklist items.
+- **Practitioner view** (hands-on): raw values on every curveball card, reason codes open, and the ledger fully expanded.
+- **Technical lines** are added for anyone who builds or governs AI workflows or lives in the data.
+- **Line of business** sets the four presenter picks on step 7.
+
+A "Tailored for" chip with a change link sits on every step. The profile is the first ledger entry, and every change is logged and included in the evidence pack. Your answers stay in this browser. Nothing is saved or sent, and there are no network calls. Screenshots: `screenshots/step0.png`, `persona-exec.png`, `persona-mgr.png`, `persona-prac.png`.
+
 ## Step 7: curveballs (v1.3)
 27 curveballs in 9 categories: Claims, Payments and Billing, Underwriting and Policy, Health/Auth, Life, Workers' Comp, Reinsurance, Fraud and Identity, Data Quirks. Filter chips switch categories. The default view is Presenter picks (HW, DP, AU, TZ). "Re-run all checks" and "Mark all spot-checks done" handle the full set. Every hold and spot-check is written to the ledger with its category, and all 27 appear in the evidence pack. Full list: [takehomes/curveball-checklist.md](takehomes/curveball-checklist.md). Background research: [../research/](../research/).
 

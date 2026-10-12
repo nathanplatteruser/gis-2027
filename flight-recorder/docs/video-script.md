@@ -22,3 +22,6 @@
 
 ## Step 7 update (v1.3)
 "There are 27 of these, in nine categories. I'll show four. Handwriting. Depreciation math, where the naive check comes up about $2,560 short on a synthetic claim. An auth that's on file and gets denied anyway. And a time zone that moves a date. Every one gets held, gets a reason code, and goes to a named person. The system never decides. Here's the ledger."
+
+## Step 0 (v1.4), add at the very start
+"Before anything else, five quick taps. Who you are, how much you've used AI, how close you are to the data, your line of business, and what you want to see. Ten seconds. Your answers stay in this browser. I'll pick executive, P&C, show me the outcome." (Tap through.) "See the chip at the top: tailored for executive. Every step now leads with the bottom line. If I click change and pick practitioner, the same cards show the raw values underneath. And the ledger's first line is who this run was tailored for."
