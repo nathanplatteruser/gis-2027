@@ -2,6 +2,7 @@
 
 Set FR_BACKEND=ollama to call a local Ollama server (http://localhost:11434).
 Set FR_MODEL to pick the model, for example llama3.1:8b or deepseek-r1:7b.
+Set FR_STREAM=1 to use streaming responses (NDJSON).
 Only the Python standard library is used, so there is nothing to pip install.
 """
 import json, os, re, urllib.error, urllib.request
@@ -25,13 +26,23 @@ def complete(system: str, user: str, mock: str) -> str:
     host = OLLAMA.split("//", 1)[1].split(":")[0]
     if host not in ("localhost", "127.0.0.1", "::1"):
         raise SystemExit("Refusing to send data off this machine. OLLAMA_HOST must be localhost.")
-    body = json.dumps({"model": MODEL, "stream": False, "options": {"temperature": 0},
+    stream = os.environ.get("FR_STREAM", "0") == "1"
+    body = json.dumps({"model": MODEL, "stream": stream, "options": {"temperature": 0},
                        "messages": [{"role": "system", "content": system},
                                     {"role": "user", "content": user}]}).encode()
     req = urllib.request.Request(OLLAMA + "/api/chat", data=body, headers={"Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
-            return _strip_think(json.loads(r.read())["message"]["content"])
+            if not stream:
+                return _strip_think(json.loads(r.read())["message"]["content"])
+            out = []
+            for line in r:  # NDJSON: one chunk per line, last one has "done": true
+                if line.strip():
+                    chunk = json.loads(line)
+                    out.append(chunk.get("message", {}).get("content", ""))
+                    if chunk.get("done"):
+                        break
+            return _strip_think("".join(out))
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise SystemExit(f"Ollama is running but model '{MODEL}' is not pulled. Run: ollama pull {MODEL}")

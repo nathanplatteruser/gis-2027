@@ -36,9 +36,13 @@ def main() -> dict:
     record("G1", "ROUTED", f"raw record is {target}; backend in use: {BACKEND}")
     summary = complete("Summarize this insurance applicant record in one sentence. Do not invent values.",
                        str(safe), mock=f"Applicant requests {safe['face_amount']} {safe['product']}; identity and health fields are redacted.")
+    echoed = [str(v) for k, v in rec.items() if classes[k] == "SENSITIVE" and str(v) in summary]
+    if echoed:
+        record("G1", "OUTPUT DISCARDED", f"model output contained {len(echoed)} sensitive value(s) it was never sent; summary withheld")
+        summary = "[withheld: output contained sensitive values]"
     print("  model sees:", safe)
     print("  summary:", summary)
-    return {"sensitive": n, "leaked": len(leaked), "route": target}
+    return {"sensitive": n, "leaked": len(leaked), "route": target, "output_leak_blocked": bool(echoed), "summary": summary}
 
 
 if __name__ == "__main__":

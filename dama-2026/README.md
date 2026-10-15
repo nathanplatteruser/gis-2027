@@ -37,6 +37,8 @@ FR_BACKEND=ollama FR_MODEL=llama3.1:8b python3 run_all.py
 
 Windows PowerShell: `$env:FR_BACKEND="ollama"; $env:FR_MODEL="deepseek-r1:7b"; py run_all.py`
 
+Test the Ollama path with no download: `python3 tests/test_ollama.py` (from the repo root) runs every lab against a bundled stand-in for the Ollama API, as `llama3.1:8b` and `deepseek-r1:7b`, with a misbehaving model that obeys the injection and invents numbers. Add `--real llama3.1:8b` to include your real Ollama. Or `make test-ollama`.
+
 Each lab also runs alone, for example `python3 gateways/g4_selfcheck_exit.py`. Every decision is appended to `out/flight-recorder.jsonl`, the audit log.
 
 The labs refuse to call any Ollama host other than localhost. The guardrails still decide the outcome when a real model answers differently from the mock, and that is the point: the model can be swapped, the gates stay.
