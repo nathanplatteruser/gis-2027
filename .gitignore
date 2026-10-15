@@ -2,3 +2,5 @@ tests/node_modules
 *.gguf
 models/
 Modelfile
+__pycache__/
+*.pyc
