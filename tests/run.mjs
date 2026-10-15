@@ -1,6 +1,6 @@
 import { webkit, chromium, firefox } from 'playwright';
 import fs from 'fs'; import http from 'http'; import path from 'path';
-const ROOT='/workspace/gis-2027/flight-recorder', SHOTS=ROOT+'/screenshots';
+const ROOT=process.env.FR_ROOT||new URL('../flight-recorder',import.meta.url).pathname, SHOTS=ROOT+'/screenshots';
 const modes=(process.env.MODES||'file,server').split(',');
 const SAFARI='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15';
 const EDGE='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0';
